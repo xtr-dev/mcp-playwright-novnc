@@ -22,13 +22,13 @@ docker run -d \
 
 Then access:
 - **noVNC Web UI**: http://localhost:6080
-- **MCP Endpoint**: http://localhost:3000/mcp
+- **MCP Endpoint**: http://localhost:3000/sse
 
 ## Usage with Claude Code
 
 ```bash
 # Register the MCP server
-claude mcp add --transport sse playwright http://localhost:3000/mcp
+claude mcp add --transport sse playwright http://localhost:3000/sse
 ```
 
 ## Usage with Claude Desktop
@@ -39,7 +39,7 @@ Add to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "playwright": {
-      "url": "http://localhost:3000/mcp"
+      "url": "http://localhost:3000/sse"
     }
   }
 }
