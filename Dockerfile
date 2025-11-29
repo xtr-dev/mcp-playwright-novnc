@@ -13,11 +13,14 @@ RUN apt-get update && apt-get install -y \
     dbus-x11 \
     && rm -rf /var/lib/apt/lists/*
 
-# Create directories for supervisor and logs
-RUN mkdir -p /var/log/supervisor /var/run/supervisor
+# Create pwuser for running the application
+RUN useradd -m -s /bin/bash pwuser
+
+# Create directories for supervisor and logs with proper permissions
+RUN mkdir -p /var/log/supervisor /var/run/supervisor \
+    && chown -R pwuser:pwuser /var/log/supervisor /var/run/supervisor
 
 # Install Playwright browsers with dependencies for headed mode
-# The base image may only have headless browsers
 RUN npx playwright install chromium --with-deps || true
 
 # Set display environment variable
@@ -27,13 +30,19 @@ ENV SCREEN_HEIGHT=1080
 ENV SCREEN_DEPTH=24
 ENV MCP_PORT=3000
 ENV MCP_BROWSER=chromium
+ENV HOME=/home/pwuser
 
 # Copy configuration files
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY entrypoint.sh /entrypoint.sh
-COPY start-mcp.sh /usr/local/bin/start-mcp.sh
-COPY playwright-config.json /etc/playwright-config.json
-RUN chmod +x /entrypoint.sh /usr/local/bin/start-mcp.sh
+COPY --chmod=755 supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY --chmod=755 entrypoint.sh /entrypoint.sh
+COPY --chmod=755 start-mcp.sh /usr/local/bin/start-mcp.sh
+COPY --chmod=644 playwright-config.json /etc/playwright-config.json
+
+# Give pwuser access to the app directory and playwright cache
+RUN chown -R pwuser:pwuser /app /home/pwuser
+
+# Switch to non-root user
+USER pwuser
 
 # Expose ports:
 # 3000 - MCP SSE server
