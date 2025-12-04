@@ -2,7 +2,14 @@ FROM mcp/playwright:latest
 
 USER root
 
-# Install X11, VNC, and process management components
+# Install X11 display server, VNC server, web-based VNC client, and process management
+# - Xvfb: Virtual X11 display server (headless display)
+# - x11vnc: VNC server to access the X11 display
+# - noVNC: Web-based VNC client accessible via browser
+# - websockify: WebSocket proxy for noVNC
+# - supervisor: Process management for running multiple services
+# - fluxbox: Lightweight window manager for the X11 session
+# - dbus-x11: D-Bus session bus for X11 applications
 RUN apt-get update && apt-get install -y \
     xvfb \
     x11vnc \
@@ -28,14 +35,20 @@ ENV DISPLAY=:99
 ENV SCREEN_WIDTH=1920
 ENV SCREEN_HEIGHT=1080
 ENV SCREEN_DEPTH=24
-ENV MCP_PORT=3000
+ENV MCP_PORT=3080
 ENV MCP_BROWSER=chromium
 ENV HOME=/home/pwuser
 
-# Copy configuration files
+# Copy configuration files and scripts
+# - supervisord.conf: Process management configuration
+# - entrypoint.sh: Container entry point script
+# - start-mcp.sh: Playwright MCP server startup script
+# - proxy.js: stdio-to-SSE bridge for MCP clients (installed as mcp-proxy command)
+# - playwright-config.json: Browser launch options (headless: false, --no-sandbox)
 COPY --chmod=755 supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 COPY --chmod=755 start-mcp.sh /usr/local/bin/start-mcp.sh
+COPY --chmod=755 proxy.js /usr/local/bin/mcp-proxy
 COPY --chmod=644 playwright-config.json /etc/playwright-config.json
 
 # Give pwuser access to the app directory and playwright cache
@@ -45,9 +58,9 @@ RUN mkdir -p /ms-playwright && chown -R pwuser:pwuser /app /home/pwuser /ms-play
 USER pwuser
 
 # Expose ports:
-# 3000 - MCP SSE server
+# 3080 - MCP SSE server
 # 5900 - VNC server (internal, used by noVNC)
 # 6080 - noVNC web interface
-EXPOSE 3000 5900 6080
+EXPOSE 3080 5900 6080
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,0 +1,30 @@
+services:
+  playwright-display:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-playwright-novnc:latest
+    container_name: playwright-display
+    ports:
+      - "3080:3080"   # MCP SSE endpoint
+      - "6080:6080"   # noVNC web interface
+    environment:
+      - SCREEN_WIDTH=${SCREEN_WIDTH:-1920}
+      - SCREEN_HEIGHT=${SCREEN_HEIGHT:-1080}
+      - SCREEN_DEPTH=${SCREEN_DEPTH:-24}
+      - MCP_PORT=3080
+      - MCP_BROWSER=${MCP_BROWSER:-chromium}
+    shm_size: '2gb'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:6080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: playwright-network

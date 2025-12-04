@@ -1,12 +1,17 @@
 #!/bin/bash
 set -e
 
+# If a command is provided, execute it instead of the default behavior
+if [ $# -gt 0 ]; then
+    exec "$@"
+fi
+
 # Set default values for environment variables
 export SCREEN_WIDTH=${SCREEN_WIDTH:-1920}
 export SCREEN_HEIGHT=${SCREEN_HEIGHT:-1080}
 export SCREEN_DEPTH=${SCREEN_DEPTH:-24}
-export MCP_PORT=${MCP_PORT:-3000}
-export MCP_BROWSER=${MCP_BROWSER:-chrome}
+export MCP_PORT=${MCP_PORT:-3080}
+export MCP_BROWSER=${MCP_BROWSER:-chromium}
 export DISPLAY=:99
 
 echo "Starting Playwright MCP with noVNC display..."

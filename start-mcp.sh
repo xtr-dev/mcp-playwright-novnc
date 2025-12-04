@@ -16,10 +16,12 @@ echo "  Viewport: ${VIEWPORT_WIDTH}x${VIEWPORT_HEIGHT}"
 
 # Run the MCP server using the cli.js from the base image
 # Config file contains browser args like --no-sandbox, --disable-infobars
+# --isolated allows multiple browser instances
 exec node /app/cli.js \
     --port "${MCP_PORT:-3000}" \
     --host 0.0.0.0 \
     --browser "${MCP_BROWSER:-chromium}" \
     --config /etc/playwright-config.json \
     --allowed-hosts "*" \
-    --viewport-size "${VIEWPORT_WIDTH}x${VIEWPORT_HEIGHT}"
+    --viewport-size "${VIEWPORT_WIDTH}x${VIEWPORT_HEIGHT}" \
+    --isolated

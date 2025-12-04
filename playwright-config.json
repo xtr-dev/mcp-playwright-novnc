@@ -1,7 +1,9 @@
 {
   "browser": {
     "launchOptions": {
+      "headless": false,
       "args": [
+        "--no-sandbox",
         "--disable-dev-shm-usage"
       ]
     }
