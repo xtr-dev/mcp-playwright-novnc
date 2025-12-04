@@ -21,7 +21,7 @@ docker compose up -d playwright-display
 ```
 
 2. Access the services:
-   - **noVNC Web UI**: http://localhost:6080
+   - **noVNC Web UI**: http://localhost:6080/vnc.html
    - **MCP SSE Endpoint**: http://localhost:3080/sse
 
 ### MCP Client Configuration
